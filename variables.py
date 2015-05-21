@@ -7,6 +7,7 @@ from utils import load_subjects_list, get_subjects_list_fold
 
 pipeline_version = '0.1'
 
+
 # SUBJECTS LIST FOLD INFO
 fold_n = 1
 fold_size = 100
