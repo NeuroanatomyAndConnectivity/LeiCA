@@ -1,1 +1,4 @@
-test.py
+test/
+dump/
+*.pyc
+
