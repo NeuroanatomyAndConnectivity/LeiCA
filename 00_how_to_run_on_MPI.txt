@@ -1,0 +1,6 @@
+
+source environments/setenv_MPI.sh
+
+DO NOT RUN VENV
+#source /home/raid2/liem/virtualenvs/CPAC_0.3.9.1/bin/activate
+
