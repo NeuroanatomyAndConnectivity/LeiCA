@@ -2,7 +2,11 @@
 PYTHONPATH=${PYTHONPATH}:/home/raid2/liem/Dropbox/Workspace/LeiCA:/home/raid2/liem/Dropbox/Workspace/LeiCA/preprocessing:/home/raid2/liem/Dropbox/Workspace/LeiCA/preprocessing/ICA_AROMA
 export PYTHONPATH
 
-FSL --version 5.0 FREESURFER --version 5.3.0 AFNI DCMSTACK
+FSL --version 5.0 FREESURFER --version 5.3.0 AFNI DCMSTACK PANDAS NUMPY CPAC
+
+
+#source /home/raid2/liem/virtualenvs/CPAC_0.3.9.1/bin/activate
+
 #PYTHONPATH=${PYTHONPATH}:/home/raid2/liem/Dropbox/Workspace/LeiCA:/home/raid2/liem/Dropbox/Workspace/LeiCA/preprocessing:/home/raid2/liem/Dropbox/Workspace/LeiCA/preprocessing/ICA_AROMA
 #export PYTHONPATH
 

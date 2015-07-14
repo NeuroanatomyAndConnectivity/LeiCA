@@ -19,7 +19,7 @@ from variables import plugin_name, use_n_procs
 
 #fixme
 plugin_name = 'MultiProc'
-use_n_procs = 3
+use_n_procs = 30
 
 
 subjects_list = full_subjects_list
@@ -48,8 +48,18 @@ for TR in TR_list:
     os.mkdir('reports')
 
     for subject_id in subjects_list:
+        print(subject_id)
         df_ss_file = os.path.join(ds_dir, subject_id, 'rsfMRI_preprocessing/QC/df', 'TR_%s'%TR, 'qc_values.pkl')
-        df_ss = pd.read_pickle(df_ss_file)
+        #fixme
+        if os.path.exists(df_ss_file):
+            df_ss = pd.read_pickle(df_ss_file)
+        else:
+            header = ['subject_id', 'similarity_epi_struct', 'similarity_struct_MNI', 'mean_FD_Power', 'n_spikes',
+                      'median_tsnr']
+            data = np.hstack( (subject_id, np.repeat(np.nan, len(header)-1)))
+            df_ss = pd.DataFrame([data], columns=header)
+            df_ss = df_ss.set_index(df_ss.subject_id)
+
 
         # link to report pdf:
         rel_report_dir = os.path.join(report_str + '_TR_%s'%TR)
@@ -79,6 +89,7 @@ for TR in TR_list:
 
     df.to_pickle('group.QC.pkl')
     df.to_csv('group.QC.csv', sep='\t')
+    df.to_excel('group.QC.xlsx')
 
     # CREAT FILE THAT CAN BE USED TO EDIT & MARK BAD QC SUBJECTS
     all_subjects_list = subjects_list + subjects_missing_files_list

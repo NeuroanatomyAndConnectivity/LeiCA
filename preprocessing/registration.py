@@ -103,7 +103,7 @@ def create_registration_pipeline(working_dir, freesurfer_dir, ds_dir, name='regi
     # II.EPI -> STRUCT (via bbr)
     ##########################################
 
-    # 3. calc EPI->STRUCT initial registration with flirt dof=6 and mutualinfo
+    # 3. calc EPI->STRUCT initial registration with flirt dof=6 and corratio
     epi_2_struct_flirt6_mat = Node(fsl.FLIRT(dof=6, cost='corratio'), name='epi_2_struct_flirt6_mat')
     epi_2_struct_flirt6_mat.inputs.out_file = 'epi_structSpace_flirt6.nii.gz'
     reg_wf.connect(inputnode, 't1w_brain', epi_2_struct_flirt6_mat, 'reference')

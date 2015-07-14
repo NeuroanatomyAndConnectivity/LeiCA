@@ -247,8 +247,7 @@ def create_denoise_pipeline(working_dir, ds_dir, name='denoise'):
     denoise_wf.connect(inputnode, 'hp_cutoff_freq', calc_hp_sigma, 'cutoff_freq')
 
     bp_filter = Node(fsl.TemporalFilter(), name='bp_filter')
-    #fixme req mem needed?
-    #bp_filter.plugin_args = {'submit_specs': 'request_memory = 17000'}
+    bp_filter.plugin_args = {'submit_specs': 'request_memory = 4000'}
 
     denoise_wf.connect(nuisance_reg, 'residual_file', bp_filter, 'in_file')
     denoise_wf.connect(calc_lp_sigma, 'sigma', bp_filter, 'lowpass_sigma')

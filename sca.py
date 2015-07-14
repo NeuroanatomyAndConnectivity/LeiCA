@@ -34,6 +34,8 @@ def create_sca_pipeline(working_dir, rois_list, ds_dir, name='sca'):
 
     epi_MNIspace = Node(fsl.ApplyWarp(), name='epi_MNIspace')
     epi_MNIspace.inputs.ref_file = fsl.Info.standard_image('MNI152_T1_2mm_brain.nii.gz')
+    epi_MNIspace.plugin_args = {'submit_specs': 'request_memory = 4000'}
+
     sca_wf.connect(inputnode, 'rs_preprocessed', epi_MNIspace, 'in_file')
     sca_wf.connect(inputnode, 'epi_2_MNI_warp' , epi_MNIspace, 'field_file')
 

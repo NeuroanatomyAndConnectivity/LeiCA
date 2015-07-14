@@ -70,7 +70,7 @@ def preprocessing_pipeline(cfg):
     # FETCH MRI DATA
     #####################################
     # GET LATERAL VENTRICLE MASK
-    templates_atlases = {'lat_ventricle_mask_MNI': 'HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz'}
+    templates_atlases = {'lat_ventricle_mask_MNI': 'cpac_image_resources/HarvardOxford-lateral-ventricles-thr25-2mm.nii.gz'}
     selectfiles_templates = Node(nio.SelectFiles(templates_atlases,
                                                  base_directory=template_dir),
                                  name="selectfiles_templates")

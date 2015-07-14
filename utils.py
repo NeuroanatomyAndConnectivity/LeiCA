@@ -1,4 +1,3 @@
-
 __author__ = 'franzliem'
 
 
@@ -55,6 +54,7 @@ def load_subjects_list(subjects_dir, file):
     subjects_file = os.path.join(subjects_dir, file)
     with open(subjects_file, 'r') as f:
         subjects_list = [line.strip() for line in f]
+    subjects_list = filter(None,subjects_list)
     return subjects_list
 
 
