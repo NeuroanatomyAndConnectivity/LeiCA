@@ -5,13 +5,11 @@ __author__ = 'franzliem'
 def collect_3d_metrics_run_glm_residuals(cfg):
     import os
     from nipype import config
-    from nipype.pipeline.engine import Node, Workflow, MapNode, JoinNode
+    from nipype.pipeline.engine import Node, Workflow
     import nipype.interfaces.utility as util
     import nipype.interfaces.io as nio
     import nipype.interfaces.fsl as fsl
-    import nipype.interfaces.freesurfer as freesurfer
-    from metrics.calc_residuals import calc_residuals
-
+    import metrics.utils
 
     # INPUT PARAMETERS
 
@@ -89,8 +87,8 @@ def collect_3d_metrics_run_glm_residuals(cfg):
 
         df['subject_id'] = df.subject_id_x
 
-        # fixme exclude subjects with mean_FD>.1
-        subjects_list_exclude = df[(df.age<18) | (df.mean_FD_Power>.1)].index
+        # fixme exclude subjects with mean_FD>.15
+        subjects_list_exclude = df[(df.age<18) | (df.mean_FD_Power>.15)].index
         subjects_list_adults = subjects_list
 
         for exclude_subject in subjects_list_exclude:
@@ -176,12 +174,13 @@ def collect_3d_metrics_run_glm_residuals(cfg):
 
 
     # CREATE MATRIX OF REGRESSORS FOR RESIDUALIZATION
-    def create_residualize_regressor_fct(df_demographics_path, df_qc_path, subjects_list, mean_values):
+    def create_condfounds_csv_fct(df_demographics_path, df_qc_path, subjects_list, mean_values):
         '''
         selects mean_FD_Power and mean_values and creates numpy array for residualization
         '''
         import pandas as pd
         import numpy as np
+        import os
 
         df = pd.read_pickle(df_demographics_path)
         df_qc = pd.read_pickle(df_qc_path)
@@ -189,20 +188,22 @@ def collect_3d_metrics_run_glm_residuals(cfg):
 
         df_use = df.loc[subjects_list]
         df_use['mean_values'] = mean_values
-        X = df_use[['mean_FD_Power','mean_values']].values
 
-        return X
+        confounds = df_use[['mean_FD_Power']].values #df_use[['mean_FD_Power','mean_values']].values
+        confounds_file = os.path.join(os.getcwd(), 'confounds.csv')
+        np.savetxt(confounds_file, confounds, delimiter='\t')
+        return confounds, confounds_file
 
 
-    create_residualize_regressor =  Node(util.Function(input_names=['df_demographics_path', 'df_qc_path',
+    create_confounds_csv =  Node(util.Function(input_names=['df_demographics_path', 'df_qc_path',
                                                                     'subjects_list', 'mean_values'],
-                                      output_names=['X'],
-                                      function=create_residualize_regressor_fct),
-                        name='create_residualize_regressor')
-    create_residualize_regressor.inputs.df_demographics_path = demos_df
-    create_residualize_regressor.inputs.df_qc_path = qc_df
-    wf.connect(get_subjects_list_adults, 'subjects_list_adults', create_residualize_regressor,'subjects_list')
-    wf.connect(get_mean_values, 'out_stat', create_residualize_regressor,'mean_values')
+                                      output_names=['confounds', 'confounds_file'],
+                                      function=create_condfounds_csv_fct),
+                        name='create_confounds_csv')
+    create_confounds_csv.inputs.df_demographics_path = demos_df
+    create_confounds_csv.inputs.df_qc_path = qc_df
+    wf.connect(get_subjects_list_adults, 'subjects_list_adults', create_confounds_csv,'subjects_list')
+    wf.connect(get_mean_values, 'out_stat', create_confounds_csv,'mean_values')
 
 
 
@@ -228,7 +229,7 @@ def collect_3d_metrics_run_glm_residuals(cfg):
         df_qc = pd.read_pickle(df_qc_path)
         df = pd.merge(df, df_qc, left_index=True, right_index=True)
 
-
+        #fixme use pd.get_dummy
         df['dummy_m'] = (df.sex == 'M').astype('int')
         df['dummy_f'] = (df.sex == 'F').astype('int')
         df['age2'] = df.age**2
@@ -285,16 +286,16 @@ def collect_3d_metrics_run_glm_residuals(cfg):
         nums_str = num_file.read()
         num_file.close()
 
-        file = open(mat_file, 'w')
+        out_file = open(mat_file, 'w')
         for line in mat_str:
-            file.write('%s\n' % line)
-        file.write(nums_str)
-        file.close()
+            out_file.write('%s\n' % line)
+        out_file.write(nums_str)
+        out_file.close()
 
-        file = open(con_file, 'w')
+        out_file = open(con_file, 'w')
         for line in cons_str:
-            file.write('%s\n' % line)
-        file.close()
+            out_file.write('%s\n' % line)
+        out_file.close()
 
         df_use.to_csv(df_used_file)
 
@@ -318,15 +319,17 @@ def collect_3d_metrics_run_glm_residuals(cfg):
 
 
     #fixme do before smoothing
-    # CALCULATE RESIDUALIZED NIIs
-    calc_residual_img = Node(util.Function(input_names=['in_file', 'X'],
-                                      output_names=['residual_file', 'regressors_file'],
-                                      function=calc_residuals),
-                        name='calc_residual_img')
+    residualize_data = Node(util.Function(input_names=['in_file', 'mask_file', 'confounds_file'],
+                                    output_names=['out_file'],
+                                    function=metrics.utils.residualize_imgs),
+                      name='residualize_data')
+    wf.connect(smooth, 'smoothed_file', residualize_data, 'in_file')
+    wf.connect(selectfiles_anat_templates, 'brain_mask_MNI_3mm', residualize_data, 'mask_file')
+    wf.connect(create_confounds_csv,'confounds_file', residualize_data, 'confounds_file')
+    wf.connect(create_confounds_csv,'confounds_file', ds, 'glm.@confounds')
+    #wf.connect(residualize_data, 'confounds_file', ds, 'glm.@confounds')
 
-    wf.connect(create_residualize_regressor,'X', calc_residual_img,'X')
-    wf.connect(smooth, 'smoothed_file', calc_residual_img, 'in_file')
-    wf.connect(calc_residual_img, 'regressors_file', ds, 'glm.@regressors' )
+
 
 
     def run_randomise_fct(data_file, mat_file, con_file, mask_file):
@@ -351,7 +354,8 @@ def collect_3d_metrics_run_glm_residuals(cfg):
     #wf.connect(merge, 'merged_file', run_randomise, 'data_file')
     #fixme
     #wf.connect(smooth, 'smoothed_file', run_randomise, 'data_file')
-    wf.connect(calc_residual_img, 'residual_file', run_randomise, 'data_file')
+    #wf.connect(calc_residual_img, 'residual_file', run_randomise, 'data_file')
+    wf.connect(residualize_data, 'out_file', run_randomise, 'data_file')
     wf.connect(create_design_files, 'mat_file', run_randomise, 'mat_file')
     wf.connect(create_design_files, 'con_file', run_randomise, 'con_file')
     #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', run_randomise, 'mask_file')

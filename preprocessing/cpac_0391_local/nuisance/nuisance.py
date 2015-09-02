@@ -157,9 +157,8 @@ def calc_residuals(subject,
     import os
     import scipy
 
-    from cpac_0391_local.nuisance import calc_compcor_components
+    from preprocessing.cpac_0391_local.nuisance.utils import calc_compcor_components
 
-    
     nii = nb.load(subject)
     data = nii.get_data().astype(np.float64)
     global_mask = (data != 0).sum(-1) != 0

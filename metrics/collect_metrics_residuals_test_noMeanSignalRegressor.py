@@ -238,7 +238,7 @@ def collect_3d_metrics_run_glm_residuals(cfg):
 
 
         #fixme
-        mat = df_use[['dummy_m', 'dummy_f', 'age','mean_FD_Power', 'mean_values']].values
+        mat = df_use[['dummy_m', 'dummy_f', 'age','mean_FD_Power']].values #, 'mean_values'
 
         mat_str = [
             '/NumWaves %s'%str(mat.shape[1]),
@@ -246,7 +246,7 @@ def collect_3d_metrics_run_glm_residuals(cfg):
             '/Matrix'
         ]
 
-        n_cons = 8
+        n_cons = 6
         cons_str = [
             '/ContrastName1 pos_age',
             '/ContrastName2 neg_age',
@@ -254,20 +254,16 @@ def collect_3d_metrics_run_glm_residuals(cfg):
             '/ContrastName4 f>m',
             '/ContrastName5 pos_mean_FD_Power',
             '/ContrastName6 neg_mean_FD_Power',
-            '/ContrastName7 pos_mean_values',
-            '/ContrastName8 neg_mean_values',
             '/NumWaves %s'%str(mat.shape[1]),
             '/NumContrasts %s'%str(n_cons),
             '',
             '/Matrix',
-            '0 0 1 0 0',
-            '0 0 -1 0 0',
-            '1 -1 0 0 0',
-            '-1 1 0 0 0',
-            '0 0 0 1 0',
-            '0 0 0 -1 0',
-            '0 0 0 0 1',
-            '0 0 0 0 -1'
+            '0 0 1 0',
+            '0 0 -1 0',
+            '1 -1 0 0',
+            '-1 1 0 0',
+            '0 0 0 1',
+            '0 0 0 -1',
             ]
 
 

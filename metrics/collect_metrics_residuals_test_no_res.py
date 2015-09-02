@@ -348,9 +348,9 @@ def collect_3d_metrics_run_glm_residuals(cfg):
     #fixme
     #wf.connect(merge, 'merged_file', run_randomise, 'data_file')
     #fixme
-    #wf.connect(smooth, 'smoothed_file', run_randomise, 'data_file')
+    wf.connect(smooth, 'smoothed_file', run_randomise, 'data_file')
     #wf.connect(calc_residual_img, 'residual_file', run_randomise, 'data_file')
-    wf.connect(residualize_data, 'out_file', run_randomise, 'data_file')
+    #wf.connect(residualize_data, 'out_file', run_randomise, 'data_file')
     wf.connect(create_design_files, 'mat_file', run_randomise, 'mat_file')
     wf.connect(create_design_files, 'con_file', run_randomise, 'con_file')
     #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', run_randomise, 'mask_file')

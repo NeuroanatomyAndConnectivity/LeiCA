@@ -25,7 +25,7 @@ def get_condor_exit_status(batch_dir):
     import glob
     import os
 
-    log_file = glob.glob(os.path.join(batch_dir, 'workflow*.dag.metrics'))[0]
+    log_file = glob.glob(os.path.join(batch_dir, 'workflow*.dag.metrics'))[-1]
     f = open(log_file)
     d = yaml.load(f)
     f.close()

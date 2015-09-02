@@ -8,11 +8,10 @@ def get_max_n_elements_in_dir_index(dir_list):
     import numpy as np
     return np.argmax([len(glob.glob(d)) for d in dir_list])
 
-
-dicom_dir='/scr/adenauer2/r5_onwards/zips/r6/nki/dicom/triotim/mmilham/'
-out_dir = '/scr/adenauer2/r5_onwards/r6_onwards'
-out_str = 'r6test'
-doDelete = False # if false only prints list with files to delete
+dicom_dir='/scr/adenauer2/nki_r5_onwards/r6_onwards/dicoms/nki/dicom/triotim/mmilham/'
+out_dir = '/scr/adenauer2/nki_r5_onwards/r6_onwards/scripts'
+out_str = 'r6_r7'
+doDelete = True # if false only prints list with files to delete
 
 
 check_img_list = ['REST_645_*', 'REST_1400_*', 'MPRAGE_SIEMENS_DEFACED*', 'REST_CAP_*', 'DIFF_137_AP_*']
@@ -70,4 +69,7 @@ with open(filename, 'w') as f:
 
 filename = os.path.join(out_dir, 'subjects_%s_strings.txt'%out_str)
 json.dump(subjects_list, open(filename,'w'))
+
+filename = os.path.join(out_dir, 'subjects_%s_no_V2_strings.txt'%out_str)
+json.dump(no_v2, open(filename,'w'))
 

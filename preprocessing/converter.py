@@ -7,7 +7,6 @@ import nipype.interfaces.fsl as fsl
 from nipype.interfaces.freesurfer.utils import ImageInfo
 from nipype.interfaces.dcmstack import DcmStack
 from nipype.interfaces.dcm2nii import Dcm2nii
-#from nipype.interfaces.dcm2nii import Dcm2nii
 import os
 
 
@@ -28,6 +27,7 @@ def create_converter_structural_pipeline(working_dir, ds_dir, name='converter_st
 
     niftisink = Node(nio.DataSink(), name='niftisink')
     niftisink.inputs.base_directory = os.path.join(ds_dir, 'raw_niftis')
+
 
 
     # convert to nifti

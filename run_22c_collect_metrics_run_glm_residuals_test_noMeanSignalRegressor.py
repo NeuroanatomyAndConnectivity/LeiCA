@@ -3,7 +3,7 @@ __author__ = 'franzliem'
 import os
 
 # # LeiCA modules
-from metrics import collect_metrics_residuals_test
+from metrics import collect_metrics_residuals_test_noMeanSignalRegressor
 
 from variables import preprocessed_data_dir, working_dir, ds_dir, script_dir, template_dir, report_base_dir
 from variables import full_subjects_list, metric_name_dict
@@ -22,8 +22,8 @@ metric_name_dict = {'alff': 'metrics/alff/alff_MNI_3mm/TR_645/residual_filtered_
 
 
 
-working_dir = os.path.join(working_dir, 'group_metric_residuals_test')
-ds_dir = os.path.join(ds_dir, 'group_metric_residuals_test')
+working_dir = os.path.join(working_dir, 'group_metric_residuals_test_noMeanSignalRegressor')
+ds_dir = os.path.join(ds_dir, 'group_metric_residuals_test_noMeanSignalRegressor')
 
 demos_df = os.path.join(script_dir, 'subjects/demographics/demographics_n415.pkl')
 qc_df = os.path.join(report_base_dir, 'rsfMRI_preprocessing_TR_645/group.QC.pkl')
@@ -51,4 +51,4 @@ for metric_name in metric_name_dict:
     cfg['plugin_name'] = plugin_name
 
 
-    collect_metrics_residuals_test.collect_3d_metrics_run_glm_residuals(cfg)
+    collect_metrics_residuals_test_noMeanSignalRegressor.collect_3d_metrics_run_glm_residuals(cfg)

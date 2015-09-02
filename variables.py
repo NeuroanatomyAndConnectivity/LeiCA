@@ -13,7 +13,7 @@ pipeline_version = '0.1'
 
 # SUBJECTS LIST FOLD INFO #0-based
 fold_n = 0
-fold_size = 400
+fold_size = 47
 
 # MOCO PARAMETERS
 vols_to_drop = 5
@@ -71,10 +71,19 @@ if arch.startswith('i386'):
 
 else:
     print 'working on %s' % hostname
-    project_root_dir = '/scr/adenauer1/Franz/LeiCA_NKI'
+    project_root_dir = '/scr/adenauer2/Franz/LeiCA_NKI'
     project_root_dir_2 = '/scr/adenauer2/Franz/LeiCA_NKI'
-    dicom_dir = os.path.join('/scr/kalifornien1/data/nki_enhanced/dicoms')
-    freesurfer_dir = os.path.join('/scr/kalifornien1/data/nki_enhanced/freesurfer')
+    #dicom_dir = os.path.join('/scr/kalifornien1/data/nki_enhanced/dicoms')
+    #freesurfer_dir = os.path.join('/scr/kalifornien1/data/nki_enhanced/freesurfer')
+
+    #r5
+    dicom_dir = os.path.join('/scr/adenauer2/nki_r5_onwards/r5/dicoms')
+    freesurfer_dir = os.path.join('/scr/adenauer2/nki_r5_onwards/r5/data/freesurfer')
+
+    #r6/7
+    dicom_dir = os.path.join('/scr/kaiser2/NKI/nki_r5_onwards/r6_onwards/dicoms/nki/dicom/triotim/mmilham')
+    freesurfer_dir = os.path.join('/scr/kaiser2/NKI//scr/adenauer2/nki_r5_onwards/r6_onwards/data/freesurfer')
+
     preprocessed_data_dir = os.path.join(project_root_dir, 'results')
     use_n_procs = 3
     #plugin_name = 'MultiProc'
@@ -82,9 +91,8 @@ else:
 
     fig_dir = '/home/raid2/liem/Dropbox/LeiCa/figs'
     report_base_dir = '/home/raid2/liem/Dropbox/LeiCa/QC'
-
-    subjects_file_prefix = 'subjects_2015-05-11'
-    subjects_file = subjects_file_prefix + '.txt'
+    subjects_file_prefix = 'subjects_2015-08-26'
+    subjects_file = subjects_file_prefix + '_redo_r5.txt'
 
 # TR LIST
 TR_list = ['645']
@@ -98,7 +106,7 @@ for d in check_dir_list:
         raise Exception('Directory %s does not exist. exit pipeline.' % d)
 
 #fixme _metrics
-working_dir = os.path.join(project_root_dir_2, 'wd_metrics')
+working_dir = os.path.join(project_root_dir_2)
 ds_dir = os.path.join(project_root_dir, 'results')
 
 # OTHER STUFF
@@ -180,4 +188,10 @@ if LooseVersion(pd.__version__) >= '0.16':
 else:
     raise Exception('pandas version >= 0.16 required')
 
+fsl_v_str=subprocess.check_output('cat $FSLDIR/etc/fslversion', shell=True).strip()
+print('Using FSL version %s' % fsl_v_str)
+if LooseVersion(fsl_v_str) >= '5':
+    print('FSL OK')
+else:
+    raise Exception('FSL >= version 5 required. version %s found'%fsl_v_str)
 

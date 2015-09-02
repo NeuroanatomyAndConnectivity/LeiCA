@@ -202,7 +202,7 @@ def collect_3d_metrics_run_glm_meanRegression(cfg):
 
 
         #fixme
-        mat = df_use[['dummy_m', 'dummy_f', 'age','mean_FD_Power', 'mean_values']].values
+        mat = df_use[['dummy_m', 'dummy_f', 'age','mean_FD_Power']].values
 
         mat_str = [
             '/NumWaves %s'%str(mat.shape[1]),
@@ -210,7 +210,7 @@ def collect_3d_metrics_run_glm_meanRegression(cfg):
             '/Matrix'
         ]
 
-        n_cons = 8
+        n_cons = 6
         cons_str = [
             '/ContrastName1 pos_age',
             '/ContrastName2 neg_age',
@@ -218,20 +218,16 @@ def collect_3d_metrics_run_glm_meanRegression(cfg):
             '/ContrastName4 f>m',
             '/ContrastName5 pos_mean_FD_Power',
             '/ContrastName6 neg_mean_FD_Power',
-            '/ContrastName7 pos_mean_values',
-            '/ContrastName8 neg_mean_values',
             '/NumWaves %s'%str(mat.shape[1]),
             '/NumContrasts %s'%str(n_cons),
             '',
             '/Matrix',
-            '0 0 1 0 0',
-            '0 0 -1 0 0',
-            '1 -1 0 0 0',
-            '-1 1 0 0 0',
-            '0 0 0 1 0',
-            '0 0 0 -1 0',
-            '0 0 0 0 1',
-            '0 0 0 0 -1'
+            '0 0 1 0',
+            '0 0 -1 0',
+            '1 -1 0 0',
+            '-1 1 0 0',
+            '0 0 0 1',
+            '0 0 0 -1'
             ]
 
 
@@ -286,16 +282,16 @@ def collect_3d_metrics_run_glm_meanRegression(cfg):
         nums_str = num_file.read()
         num_file.close()
 
-        file = open(mat_file, 'w')
+        out_file = open(mat_file, 'w')
         for line in mat_str:
-            file.write('%s\n' % line)
-        file.write(nums_str)
-        file.close()
+            out_file.write('%s\n' % line)
+        out_file.write(nums_str)
+        out_file.close()
 
-        file = open(con_file, 'w')
+        out_file = open(con_file, 'w')
         for line in cons_str:
-            file.write('%s\n' % line)
-        file.close()
+            out_file.write('%s\n' % line)
+        out_file.close()
 
         df_use.to_csv(df_used_file)
 

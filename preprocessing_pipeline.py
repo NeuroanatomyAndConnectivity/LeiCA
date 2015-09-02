@@ -11,7 +11,7 @@ def preprocessing_pipeline(cfg):
     import nipype.interfaces.freesurfer as freesurfer
 
     # LeiCA modules
-    from LeiCA.utils import zip_and_save_running_scripts
+    from utils import zip_and_save_running_scripts
     from preprocessing.rsfMRI_preprocessing import create_rsfMRI_preproc_pipeline
     from preprocessing.converter import create_converter_structural_pipeline, create_converter_functional_pipeline, \
         create_converter_diffusion_pipeline
