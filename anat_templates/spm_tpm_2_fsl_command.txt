@@ -1,0 +1,15 @@
+cd /Users/franzliem/Dropbox/Workspace/LeiCA/anat_templates
+mkdir SPM_GM
+cd SPM_GM
+fslroi /Applications/spm12/tpm/TPM.nii ./SPM_GM_prob.nii.gz 0 1
+flirt -in SPM_GM_prob.nii.gz -ref /Applications/fsl/data/standard/MNI152_T1_1mm_brain.nii.gz  -omat spm_2_fsl_1mm.mat
+
+flirt -in SPM_GM_prob.nii.gz -ref /Applications/fsl/data/standard/MNI152_T1_2mm_brain.nii.gz  -applyxfm -init spm_2_fsl_1mm.mat -out SPM_GM_prob_2mm.nii.gz
+
+fslmaths SPM_GM_prob_2mm.nii.gz -thr 0.2 -bin SPM_GM_mask_2mm.nii.gz
+
+flirt -in SPM_GM_prob.nii.gz -ref /Applications/fsl/data/standard/MNI152_T1_3mm_brain.nii.gz  -applyxfm -init spm_2_fsl_1mm.mat -out SPM_GM_prob_3mm.nii.gz
+fslmaths SPM_GM_prob_3mm.nii.gz -thr 0.2 -bin SPM_GM_mask_3mm.nii.gz
+
+rm SPM_GM_prob.nii.gz SPM_GM_prob_*mm.nii.gz
+
