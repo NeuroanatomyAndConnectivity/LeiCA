@@ -11,7 +11,7 @@ def preprocessing_pipeline(cfg):
     import nipype.interfaces.freesurfer as freesurfer
 
     # LeiCA modules
-    from utils import zip_and_save_running_scripts
+    from LeiCA.utils import zip_and_save_running_scripts
     from preprocessing.rsfMRI_preprocessing import create_rsfMRI_preproc_pipeline
     from preprocessing.converter import create_converter_structural_pipeline, create_converter_functional_pipeline, \
         create_converter_diffusion_pipeline
@@ -75,27 +75,48 @@ def preprocessing_pipeline(cfg):
                                                  base_directory=template_dir),
                                  name="selectfiles_templates")
 
+    if not subject_id.startswith('A000'): # releases 1-6 with 01... format subject_id
+        # GET FUNCTIONAL DATA
+        templates_funct = {'funct_dicom': '{subject_id}/session_1/RfMRI_*_{TR_id}'}
 
-    # GET FUNCTIONAL DATA
-    templates_funct = {'funct_dicom': '{subject_id}/session_1/RfMRI_*_{TR_id}'}
+        selectfiles_funct = Node(nio.SelectFiles(templates_funct,
+                                                 base_directory=dicom_dir),
+                                 name="selectfiles_funct")
+        selectfiles_funct.inputs.subject_id = subject_id
 
-    selectfiles_funct = Node(nio.SelectFiles(templates_funct,
-                                             base_directory=dicom_dir),
-                             name="selectfiles_funct")
-    selectfiles_funct.inputs.subject_id = subject_id
-
-    wf.connect(scan_infosource, 'TR_id', selectfiles_funct, 'TR_id')
+        wf.connect(scan_infosource, 'TR_id', selectfiles_funct, 'TR_id')
 
 
-    # GET STRUCTURAL DATA
-    templates_struct = {'t1w_dicom': '{subject_id}/anat',
-                        'dMRI_dicom': '{subject_id}/session_1/DTI_mx_137/*.dcm'} # *.dcm for dMRI as Dcm2nii requires this
+        # GET STRUCTURAL DATA
+        templates_struct = {'t1w_dicom': '{subject_id}/anat',
+                            'dMRI_dicom': '{subject_id}/session_1/DTI_mx_137/*.dcm'} # *.dcm for dMRI as Dcm2nii requires this
 
-    selectfiles_struct = Node(nio.SelectFiles(templates_struct,
-                                              base_directory=dicom_dir),
-                              name="selectfiles_struct")
-    selectfiles_struct.inputs.subject_id = subject_id
+        selectfiles_struct = Node(nio.SelectFiles(templates_struct,
+                                                  base_directory=dicom_dir),
+                                  name="selectfiles_struct")
+        selectfiles_struct.inputs.subject_id = subject_id
 
+
+
+    else: #startin with release 6 new folder structure
+        templates_funct = {'funct_dicom': '*/{subject_id}/*_V2/REST_{TR_id}*/*.dcm'}
+
+        selectfiles_funct = Node(nio.SelectFiles(templates_funct,
+                                                 base_directory=dicom_dir),
+                                 name="selectfiles_funct")
+        selectfiles_funct.inputs.subject_id = subject_id
+
+        wf.connect(scan_infosource, 'TR_id', selectfiles_funct, 'TR_id')
+
+
+        # GET STRUCTURAL DATA
+        templates_struct = {'t1w_dicom': '*/{subject_id}/*_V2/MPRAGE_SIEMENS_DEFACED*/*.dcm',
+                            'dMRI_dicom': '{subject_id}/*_V2/DIFF_137_AP*/*.dcm'} # *.dcm for dMRI as Dcm2nii requires this
+
+        selectfiles_struct = Node(nio.SelectFiles(templates_struct,
+                                                  base_directory=dicom_dir),
+                                  name="selectfiles_struct")
+        selectfiles_struct.inputs.subject_id = subject_id
 
 
 
@@ -127,7 +148,6 @@ def preprocessing_pipeline(cfg):
     wf.connect(scan_infosource, 'TR_id', converter_funct, 'inputnode.out_format')
 
 
-
     #####################################
     # START RSFMRI PREPROCESSING ANALYSIS
     #####################################
@@ -152,9 +172,9 @@ def preprocessing_pipeline(cfg):
     # SCA
     #####################################
 
-    sca = create_sca_pipeline(working_dir, rois_list, ds_dir, name='sca')
-    wf.connect(rsfMRI_preproc, 'outputnode.rs_preprocessed', sca, 'inputnode.rs_preprocessed')
-    wf.connect(rsfMRI_preproc, 'outputnode.epi_2_MNI_warp', sca, 'inputnode.epi_2_MNI_warp')
+    # sca = create_sca_pipeline(working_dir, rois_list, ds_dir, name='sca')
+    # wf.connect(rsfMRI_preproc, 'outputnode.rs_preprocessed', sca, 'inputnode.rs_preprocessed')
+    # wf.connect(rsfMRI_preproc, 'outputnode.epi_2_MNI_warp', sca, 'inputnode.epi_2_MNI_warp')
 
     # if len(subjects_list)>1:
     #     def test_fct(in_files):
