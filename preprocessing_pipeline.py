@@ -111,7 +111,7 @@ def preprocessing_pipeline(cfg):
 
         # GET STRUCTURAL DATA
         templates_struct = {'t1w_dicom': '*/{subject_id}/*_V2/MPRAGE_SIEMENS_DEFACED*/*.dcm',
-                            'dMRI_dicom': '{subject_id}/*_V2/DIFF_137_AP*/*.dcm'} # *.dcm for dMRI as Dcm2nii requires this
+                            'dMRI_dicom': '*/{subject_id}/*_V2/DIFF_137_AP*/*.dcm'} # *.dcm for dMRI as Dcm2nii requires this
 
         selectfiles_struct = Node(nio.SelectFiles(templates_struct,
                                                   base_directory=dicom_dir),
