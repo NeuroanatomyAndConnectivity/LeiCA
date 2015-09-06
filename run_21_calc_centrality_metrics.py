@@ -11,7 +11,7 @@ import os
 from metrics import calc_metrics
 
 from variables import dicom_dir, preprocessed_data_dir, working_dir, freesurfer_dir, template_dir, script_dir, ds_dir
-from variables import TR_list, subjects_list
+from variables import TR_list, full_subjects_list
 from variables import plugin_name
 
 
@@ -29,7 +29,7 @@ ds_dir = os.path.join(ds_dir)
 # INPUT PARAMETERS for pipeline
 cfg ={}
 
-cfg['subjects_list'] = subjects_list
+cfg['subjects_list'] = full_subjects_list
 
 cfg['dicom_dir'] = dicom_dir
 cfg['preprocessed_data_dir'] = preprocessed_data_dir
