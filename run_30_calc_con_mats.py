@@ -29,20 +29,19 @@ time_series_file = '/Users/franzliem/Desktop/LeiCA/0144314/residual_filt_norm_wa
 
 # INPUT PARAMETERS for pipeline
 
-bp_freq_list = [(), (0.01, 0.1)]
+bp_freq_list = [(0, 0), (0.01, 0.1)]
 
-parcellation_list = []
-parcellation_list.append({'name': 'msdl',
-                          'path': os.path.join(template_dir, 'parcellations/msdl_atlas/MSDL_rois/msdl_rois.nii')
-                          'is_probabilistic': True})
+
+parcellations_dict = {}
+parcellations_dict['msdl'] = {'nii_path': os.path.join(template_dir, 'parcellations/msdl_atlas/MSDL_rois/msdl_rois.nii'),
+                          'is_probabilistic': True}
 
 extraction_methods_list = ['correlation']
 
 calc_con_mats.connectivity_matrix_wf(time_series_file,
                                      working_dir=subject_working_dir,
                                      ds_dir=subject_ds_dir,
-                                     subject_id=subject_id,
-                                     parcellations_list=parcellation_list,
+                                     parcellations_dict=parcellations_dict,
                                      extraction_methods_list=extraction_methods_list,
                                      bp_freq_list=bp_freq_list,
                                      use_n_procs=use_n_procs,
