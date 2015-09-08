@@ -14,17 +14,14 @@ from variables import TR_list, subjects_list
 from variables import vols_to_drop, rois_list, lp_cutoff_freq, hp_cutoff_freq, use_fs_brainmask
 from variables import use_n_procs, plugin_name
 
-
-
-
-
+working_dir = os.path.join(working_dir, 'wd_metrics')
 
 for subject_id in subjects_list:
     subject_working_dir = os.path.join(working_dir, subject_id)
     subject_ds_dir = os.path.join(ds_dir, subject_id, 'metrics')
 
     # INPUT PARAMETERS for pipeline
-    cfg ={}
+    cfg = {}
 
     cfg['subject_id'] = subject_id
 
@@ -49,4 +46,3 @@ for subject_id in subjects_list:
     cfg['plugin_name'] = plugin_name
 
     calc_metrics.calc_local_metrics(cfg)
-
