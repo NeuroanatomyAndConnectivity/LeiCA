@@ -2,6 +2,19 @@ import os
 import pandas as pd
 
 
+def get_health_status(filename):
+    def get_no_axis_1(s):
+        if s.startswith('#CODE:V71.09'):
+            return True
+        else:
+            return False
+
+    df = read_nki_cvs(filename)
+    df['no_axis_1'] = df['DIAG_01'].map(get_no_axis_1)
+    df = df[['no_axis_1', 'DIAG_01']]
+    return df
+
+
 def read_nki_cvs(filename):
     '''
     imports nki csv and returns pandas data frame with 'Anonymous ID' as index

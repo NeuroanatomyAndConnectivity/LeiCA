@@ -2,7 +2,7 @@
 #check for duplicates
 import os, glob
 import pandas as pd
-from utils import read_nki_cvs, leica_id_to_a_number_mapping, merge_dataframes
+from utils import read_nki_cvs, leica_id_to_a_number_mapping, merge_dataframes, get_health_status
 
 
 
@@ -23,6 +23,7 @@ for file_stub in behav_files_stubs_list:
     #import pdb; pdb.set_trace()
 
     for f in file_list:
+        print(f)
         df_add = read_nki_cvs(f)
         # if 'Subject Type' in df_add.columns:
         #     print('Dropping Subject Type from df as this often causes duplicates.')
@@ -30,6 +31,11 @@ for file_stub in behav_files_stubs_list:
 
         df = merge_dataframes(df, df_add)
 
+
+# get health status
+diagnostics_file = glob.glob(os.path.join(behav_files_path, '*_Diagnostic Summary_*'))[0]
+df_health = get_health_status(diagnostics_file)
+df = merge_dataframes(df, df_health)
 
 #add subjects id mapping to df
 df = merge_dataframes(df, leica_subjects)
