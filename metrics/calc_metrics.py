@@ -76,15 +76,15 @@ def calc_local_metrics(cfg):
 
 
     # get atlas data
-    templates_atlases = {#'GM_mask_MNI_2mm': 'SPM_GM/SPM_GM_mask_2mm.nii.gz',
-                         #'GM_mask_MNI_3mm': 'SPM_GM/SPM_GM_mask_3mm.nii.gz',
-                         'FSL_MNI_3mm_template': 'MNI152_T1_3mm_brain.nii.gz',
-                         'vmhc_symm_brain': 'cpac_image_resources/symmetric/MNI152_T1_2mm_brain_symmetric.nii.gz',
-                         'vmhc_symm_brain_3mm': 'cpac_image_resources/symmetric/MNI152_T1_3mm_brain_symmetric.nii.gz',
-                         'vmhc_symm_skull': 'cpac_image_resources/symmetric/MNI152_T1_2mm_symmetric.nii.gz',
-                         'vmhc_symm_brain_mask_dil': 'cpac_image_resources/symmetric/MNI152_T1_2mm_brain_mask_symmetric_dil.nii.gz',
-                         'vmhc_config_file_2mm': 'cpac_image_resources/symmetric/T1_2_MNI152_2mm_symmetric.cnf'
-                         }
+    templates_atlases = {  # 'GM_mask_MNI_2mm': 'SPM_GM/SPM_GM_mask_2mm.nii.gz',
+                           # 'GM_mask_MNI_3mm': 'SPM_GM/SPM_GM_mask_3mm.nii.gz',
+                           'FSL_MNI_3mm_template': 'MNI152_T1_3mm_brain.nii.gz',
+                           'vmhc_symm_brain': 'cpac_image_resources/symmetric/MNI152_T1_2mm_brain_symmetric.nii.gz',
+                           'vmhc_symm_brain_3mm': 'cpac_image_resources/symmetric/MNI152_T1_3mm_brain_symmetric.nii.gz',
+                           'vmhc_symm_skull': 'cpac_image_resources/symmetric/MNI152_T1_2mm_symmetric.nii.gz',
+                           'vmhc_symm_brain_mask_dil': 'cpac_image_resources/symmetric/MNI152_T1_2mm_brain_mask_symmetric_dil.nii.gz',
+                           'vmhc_config_file_2mm': 'cpac_image_resources/symmetric/T1_2_MNI152_2mm_symmetric.cnf'
+                           }
 
     selectfiles_anat_templates = Node(nio.SelectFiles(templates_atlases,
                                                       base_directory=template_dir),
@@ -161,7 +161,7 @@ def calc_local_metrics(cfg):
     alff.inputs.hp_input.hp = 0.01
     alff.inputs.lp_input.lp = 0.1
     wf.connect(selectfiles, 'preproc_epi_full_spectrum', alff, 'inputspec.rest_res')
-    #wf.connect(GM_mask_epiSpace, 'out_file', alff, 'inputspec.rest_mask')
+    # wf.connect(GM_mask_epiSpace, 'out_file', alff, 'inputspec.rest_mask')
     wf.connect(selectfiles, 'epi_mask', alff, 'inputspec.rest_mask')
     wf.connect(alff, 'outputspec.alff_img', ds, 'alff.alff')
     wf.connect(alff, 'outputspec.falff_img', ds, 'alff.falff')
@@ -191,24 +191,26 @@ def calc_local_metrics(cfg):
     # f/ALFF_MNI Z-SCORE
     alff_MNIspace_3mm_Z = cpac_utils.get_zscore(input_name='alff_MNIspace_3mm', wf_name='alff_MNIspace_3mm_Z')
     wf.connect(alff_MNIspace_3mm, 'out_file', alff_MNIspace_3mm_Z, 'inputspec.input_file')
-    #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', alff_MNIspace_3mm_Z, 'inputspec.mask_file')
+    # wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', alff_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', alff_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(alff_MNIspace_3mm_Z, 'outputspec.z_score_img', ds, 'alff.alff_MNI_3mm_Z')
 
     falff_MNIspace_3mm_Z = cpac_utils.get_zscore(input_name='falff_MNIspace_3mm', wf_name='falff_MNIspace_3mm_Z')
     wf.connect(falff_MNIspace_3mm, 'out_file', falff_MNIspace_3mm_Z, 'inputspec.input_file')
-    #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', falff_MNIspace_3mm_Z, 'inputspec.mask_file')
+    # wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', falff_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', falff_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(falff_MNIspace_3mm_Z, 'outputspec.z_score_img', ds, 'alff.falff_MNI_3mm_Z')
 
 
     # f/ALFF_MNI STANDARDIZE BY MEAN
-    alff_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(wf_name='alff_MNIspace_3mm_standardized_mean')
+    alff_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(
+        wf_name='alff_MNIspace_3mm_standardized_mean')
     wf.connect(alff_MNIspace_3mm, 'out_file', alff_MNIspace_3mm_standardized_mean, 'inputnode.in_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', alff_MNIspace_3mm_standardized_mean, 'inputnode.mask_file')
     wf.connect(alff_MNIspace_3mm_standardized_mean, 'outputnode.out_file', ds, 'alff.alff_MNI_3mm_standardized_mean')
 
-    falff_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(wf_name='falff_MNIspace_3mm_standardized_mean')
+    falff_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(
+        wf_name='falff_MNIspace_3mm_standardized_mean')
     wf.connect(falff_MNIspace_3mm, 'out_file', falff_MNIspace_3mm_standardized_mean, 'inputnode.in_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', falff_MNIspace_3mm_standardized_mean, 'inputnode.mask_file')
     wf.connect(falff_MNIspace_3mm_standardized_mean, 'outputnode.out_file', ds, 'alff.falff_MNI_3mm_standardized_mean')
@@ -221,7 +223,7 @@ def calc_local_metrics(cfg):
     reho = cpac_reho.create_reho()
     reho.inputs.inputspec.cluster_size = 27
     wf.connect(selectfiles, 'preproc_epi_bp', reho, 'inputspec.rest_res_filt')
-    #wf.connect(GM_mask_epiSpace, 'out_file', reho, 'inputspec.rest_mask')
+    # wf.connect(GM_mask_epiSpace, 'out_file', reho, 'inputspec.rest_mask')
     wf.connect(selectfiles, 'epi_mask', reho, 'inputspec.rest_mask')
     wf.connect(reho, 'outputspec.raw_reho_map', ds, 'reho.reho')
 
@@ -242,14 +244,15 @@ def calc_local_metrics(cfg):
     # REHO_MNI Z-SCORE
     reho_MNIspace_3mm_Z = cpac_utils.get_zscore(input_name='reho_MNIspace_3mm', wf_name='reho_MNIspace_3mm_Z')
     wf.connect(alff_MNIspace_3mm, 'out_file', reho_MNIspace_3mm_Z, 'inputspec.input_file')
-    #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', reho_MNIspace_3mm_Z, 'inputspec.mask_file')
+    # wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', reho_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', reho_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(reho_MNIspace_3mm_Z, 'outputspec.z_score_img', ds, 'reho.reho_MNI_3mm_Z')
 
 
 
     # REHO_MNI STANDARDIZE BY MEAN
-    reho_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(wf_name='reho_MNIspace_3mm_standardized_mean')
+    reho_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(
+        wf_name='reho_MNIspace_3mm_standardized_mean')
     wf.connect(reho_MNIspace_3mm, 'out_file', reho_MNIspace_3mm_standardized_mean, 'inputnode.in_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', reho_MNIspace_3mm_standardized_mean, 'inputnode.mask_file')
     wf.connect(reho_MNIspace_3mm_standardized_mean, 'outputnode.out_file', ds, 'reho.reho_MNI_3mm_standardized_mean')
@@ -273,14 +276,14 @@ def calc_local_metrics(cfg):
 
 
 
-    #fixme
+    # fixme
     vmhc = cpac_vmhc.create_vmhc(use_ants=False, name='vmhc')
     vmhc.inputs.fwhm_input.fwhm = 4
     wf.connect(selectfiles_anat_templates, 'vmhc_symm_brain_3mm', vmhc, 'inputspec.standard_for_func')
     wf.connect(selectfiles, 'preproc_epi_bp_tNorm', vmhc, 'inputspec.rest_res')
     wf.connect(selectfiles, 'epi_2_struct_mat', vmhc, 'inputspec.example_func2highres_mat')
     wf.connect(struct_2_MNI_symm, 'outputspec.nonlinear_xfm', vmhc, 'inputspec.fnirt_nonlinear_warp')
-    #wf.connect(GM_mask_epiSpace, 'out_file', vmhc, 'inputspec.rest_mask')
+    # wf.connect(GM_mask_epiSpace, 'out_file', vmhc, 'inputspec.rest_mask')
     wf.connect(selectfiles, 'epi_mask', vmhc, 'inputspec.rest_mask')
 
     wf.connect(vmhc, 'outputspec.rest_res_2symmstandard', ds, 'vmhc.rest_res_2symmstandard')
@@ -292,9 +295,9 @@ def calc_local_metrics(cfg):
 
     # VARIABILITY SCORES
     variability = Node(util.Function(input_names=['in_file'],
-                                      output_names=['out_file_list'],
-                                      function=calc_metrics_utils.calc_variability),
-                        name='variability')
+                                     output_names=['out_file_list'],
+                                     function=calc_metrics_utils.calc_variability),
+                       name='variability')
     wf.connect(selectfiles, 'preproc_epi_bp', variability, 'in_file')
     wf.connect(variability, 'out_file_list', ds, 'variability.subjectSpace.@out_files')
 
@@ -312,18 +315,19 @@ def calc_local_metrics(cfg):
     # CALC Z SCORE
     variabilty_MNIspace_3mm_Z = cpac_centrality_z_score.get_cent_zscore(wf_name='variabilty_MNIspace_3mm_Z')
     wf.connect(variabilty_MNIspace_3mm, 'out_file', variabilty_MNIspace_3mm_Z, 'inputspec.input_file')
-    #wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', variabilty_MNIspace_3mm_Z, 'inputspec.mask_file')
+    # wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', variabilty_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', variabilty_MNIspace_3mm_Z, 'inputspec.mask_file')
     wf.connect(variabilty_MNIspace_3mm_Z, 'outputspec.z_score_img', ds, 'variability.MNI_3mm_Z.@out_file')
 
 
 
     # STANDARDIZE BY MEAN
-    variabilty_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(wf_name='variabilty_MNIspace_3mm_standardized_mean')
+    variabilty_MNIspace_3mm_standardized_mean = calc_metrics_utils.standardize_divide_by_mean(
+        wf_name='variabilty_MNIspace_3mm_standardized_mean')
     wf.connect(variabilty_MNIspace_3mm, 'out_file', variabilty_MNIspace_3mm_standardized_mean, 'inputnode.in_file')
     wf.connect(epi_mask_MNIspace_3mm, 'out_file', variabilty_MNIspace_3mm_standardized_mean, 'inputnode.mask_file')
-    wf.connect(variabilty_MNIspace_3mm_standardized_mean, 'outputnode.out_file', ds, 'variability.MNI_3mm_standardized_mean.@out_file')
-
+    wf.connect(variabilty_MNIspace_3mm_standardized_mean, 'outputnode.out_file', ds,
+               'variability.MNI_3mm_standardized_mean.@out_file')
 
     wf.write_graph(dotfilename=wf.name, graph2use='colored', format='pdf')  # 'hierarchical')
     wf.write_graph(dotfilename=wf.name, graph2use='orig', format='pdf')
@@ -333,10 +337,6 @@ def calc_local_metrics(cfg):
         wf.run(plugin=plugin_name)
     if plugin_name == 'MultiProc':
         wf.run(plugin=plugin_name, plugin_args={'n_procs': use_n_procs})
-
-
-
-
 
 
 def calc_centrality_metrics(cfg):
@@ -365,7 +365,6 @@ def calc_centrality_metrics(cfg):
     subjects_list = cfg['subjects_list']
     TR_list = cfg['TR_list']
 
-
     use_n_procs = cfg['use_n_procs']
     plugin_name = cfg['plugin_name']
 
@@ -388,7 +387,8 @@ def calc_centrality_metrics(cfg):
 
     ds = Node(nio.DataSink(), name='ds')
     ds.inputs.substitutions = [('_TR_id_', 'TR_')]
-    ds.inputs.regexp_substitutions = [('_subject_id_[0-9]*', ''), ('_z_score[0-9]*/', '')]  #, #('dc/_TR_id_[0-9]*/', ''), ('evc/_TR_id_[0-9]*/','')]
+    ds.inputs.regexp_substitutions = [('_subject_id_[0-9]*', ''), (
+    '_z_score[0-9]*/', '')]  # , #('dc/_TR_id_[0-9]*/', ''), ('evc/_TR_id_[0-9]*/','')]
 
     #####################################
     # SET ITERATORS
@@ -406,9 +406,9 @@ def calc_centrality_metrics(cfg):
         return out_path
 
     add_subject_id_to_ds_dir = Node(util.Function(input_names=['subject_id', 'ds_path'],
-                                  output_names=['out_path'],
-                                  function=add_subject_id_to_ds_dir_fct),
-                    name='add_subject_id_to_ds_dir')
+                                                  output_names=['out_path'],
+                                                  function=add_subject_id_to_ds_dir_fct),
+                                    name='add_subject_id_to_ds_dir')
     wf.connect(subjects_infosource, 'subject_id', add_subject_id_to_ds_dir, 'subject_id')
     add_subject_id_to_ds_dir.inputs.ds_path = ds_dir
 
@@ -448,7 +448,7 @@ def calc_centrality_metrics(cfg):
                        name="selectfiles")
     wf.connect(scan_infosource, 'TR_id', selectfiles, 'TR_id')
     wf.connect(subjects_infosource, 'subject_id', selectfiles, 'subject_id')
-    #selectfiles.inputs.subject_id = subject_id
+    # selectfiles.inputs.subject_id = subject_id
 
 
 
@@ -479,19 +479,21 @@ def calc_centrality_metrics(cfg):
 
 
     # DEGREE
-    #fixme
-    #a_mem = 5
-    #fixme
+    # fixme
+    # a_mem = 5
+    # fixme
     a_mem = 20
-    dc = cpac_centrality.create_resting_state_graphs(allocated_memory=a_mem, wf_name = 'dc')#allocated_memory = a_mem, wf_name = 'dc')
-    #dc.plugin_args = {'submit_specs': 'request_memory = 6000'}
-    #fixme
+    dc = cpac_centrality.create_resting_state_graphs(allocated_memory=a_mem,
+                                                     wf_name='dc')  # allocated_memory = a_mem, wf_name = 'dc')
+    # dc.plugin_args = {'submit_specs': 'request_memory = 6000'}
+    # fixme
     dc.plugin_args = {'submit_specs': 'request_memory = 20000'}
 
-    dc.inputs.inputspec.method_option = 0 #0 for degree centrality, 1 for eigenvector centrality, 2 for lFCD
-    dc.inputs.inputspec.threshold_option = 0 # 0 for probability p_value, 1 for sparsity threshold, any other for threshold value
+    dc.inputs.inputspec.method_option = 0  # 0 for degree centrality, 1 for eigenvector centrality, 2 for lFCD
+    dc.inputs.inputspec.threshold_option = 0  # 0 for probability p_value, 1 for sparsity threshold, any other for threshold value
     dc.inputs.inputspec.threshold = 0.0001
-    dc.inputs.inputspec.weight_options = [True, True] # list of two booleans for binarize and weighted options respectively
+    dc.inputs.inputspec.weight_options = [True,
+                                          True]  # list of two booleans for binarize and weighted options respectively
     wf.connect(epi_bp_tNorm_MNIspace_3mm, 'out_file', dc, 'inputspec.subject')
     wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', dc, 'inputspec.template')
     wf.connect(dc, 'outputspec.centrality_outputs', ds, 'metrics.centrality.dc.@centrality_outputs')
@@ -504,15 +506,15 @@ def calc_centrality_metrics(cfg):
     wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', dc_Z, 'inputspec.mask_file')
     wf.connect(dc_Z, 'outputspec.z_score_img', ds, 'metrics.centrality.dc_z.@output')
 
-
     a_mem = 20
-    evc = cpac_centrality.create_resting_state_graphs(allocated_memory=a_mem, wf_name = 'evc')
+    evc = cpac_centrality.create_resting_state_graphs(allocated_memory=a_mem, wf_name='evc')
     evc.plugin_args = {'submit_specs': 'request_memory = 20000'}
 
-    evc.inputs.inputspec.method_option = 1 #0 for degree centrality, 1 for eigenvector centrality, 2 for lFCD
-    evc.inputs.inputspec.threshold_option = 0 # 0 for probability p_value, 1 for sparsity threshold, any other for threshold value
-    evc.inputs.inputspec.threshold =  0.0001
-    evc.inputs.inputspec.weight_options = [True, True] # list of two booleans for binarize and weighted options respectively
+    evc.inputs.inputspec.method_option = 1  # 0 for degree centrality, 1 for eigenvector centrality, 2 for lFCD
+    evc.inputs.inputspec.threshold_option = 0  # 0 for probability p_value, 1 for sparsity threshold, any other for threshold value
+    evc.inputs.inputspec.threshold = 0.0001
+    evc.inputs.inputspec.weight_options = [True,
+                                           True]  # list of two booleans for binarize and weighted options respectively
     wf.connect(epi_bp_tNorm_MNIspace_3mm, 'out_file', evc, 'inputspec.subject')
     wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', evc, 'inputspec.template')
     wf.connect(evc, 'outputspec.centrality_outputs', ds, 'metrics.centrality.evc.@centrality_outputs')
@@ -524,7 +526,6 @@ def calc_centrality_metrics(cfg):
     wf.connect(evc, 'outputspec.centrality_outputs', evc_Z, 'inputspec.input_file')
     wf.connect(selectfiles_anat_templates, 'GM_mask_MNI_3mm', evc_Z, 'inputspec.mask_file')
     wf.connect(evc_Z, 'outputspec.z_score_img', ds, 'metrics.centrality.evc_z.@output')
-
 
     wf.write_graph(dotfilename=wf.name, graph2use='colored', format='pdf')  # 'hierarchical')
     wf.write_graph(dotfilename=wf.name, graph2use='orig', format='pdf')
