@@ -9,9 +9,9 @@ from nipype.pipeline.engine import Node, Workflow
 import nipype.interfaces.utility as util
 
 from utils import get_condor_exit_status, check_if_wf_crashed, load_subjects_list
-from qc_reports.create_qc_report_pdf import create_qc_report_pdf
+
 from variables import ds_dir, report_base_dir, subjects_dir, working_dir
-from variables import TR_list, subjects_list, subjects_file_prefix
+from variables import TR_list, full_subjects_list, subjects_file_prefix
 from variables import plugin_name, use_n_procs
 
 
@@ -22,20 +22,12 @@ plugin_name = 'MultiProc'
 use_n_procs = 3
 
 
-subjects_missing_files_list = load_subjects_list(subjects_dir, subjects_file_prefix + '_excluded.txt')
-
 
 report_str = 'rsfMRI_preprocessing'
 
 
-wf = Workflow('qc_reports_wf')
-wf.base_dir = report_base_dir
-wf.config['execution']['crashdump_dir'] = os.path.join(report_base_dir, 'crash')
-wf.config['execution']['stop_on_first_crash'] = False
-
 # collect dfs
 df = pd.DataFrame()
-print subjects_list
 
 for TR in TR_list:
     rel_report_dir = os.path.join('WD_' + report_str + '_TR_%s'%TR)
@@ -46,11 +38,12 @@ for TR in TR_list:
     os.chdir(rel_report_dir)
     os.mkdir('reports')
 
-    for subject_id in subjects_list:
+    for subject_id in full_subjects_list:
         print(subject_id)
 
         # get condor exit status
-        batch_dir =os.path.join(working_dir, subject_id, 'LeiCA_resting', 'batch')
+        #batch_dir =os.path.join(working_dir,'preprocessing', subject_id, 'LeiCA_resting', 'batch')
+        batch_dir =os.path.join(working_dir,'wd_metrics', subject_id, 'LeiCA_metrics', 'batch')
         if os.path.exists(batch_dir):
             try:
                 condor_exitcode, condor_n_jobs_failed = get_condor_exit_status(batch_dir)
