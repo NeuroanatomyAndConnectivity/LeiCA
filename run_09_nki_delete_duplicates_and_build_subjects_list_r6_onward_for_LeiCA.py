@@ -13,8 +13,6 @@ check_img_list = ['REST_645_*', 'REST_1400_*', 'MPRAGE_SIEMENS_DEFACED*', 'REST_
 #dicom_dir='/scr/adenauer2/Franz/r7_test/nki/dicom/triotim/mmilham/discoverysci_30001'
 #dicom_dir='/scr/adenauer2/Franz/r7_test/nki/dicom/triotim/mmilham/'
 
-dicom_dir = '/scr/adenauer2/nki_r5_onwards/r6_onwards/dicoms/nki/dicom/triotim/mmilham'
-freesurfer_dir = '/scr/adenauer2/nki_r5_onwards/r6_onwards/data/freesurfer'
 
 os.chdir(dicom_dir)
 
@@ -89,7 +87,7 @@ for bad_subject in bad_subjects_list:
 
 print len(subjects_list)
 
-td_str = datetime.datetime.isoformat(datetime.datetime.today())[:10] + 'r6_r_7_'
+td_str = datetime.datetime.isoformat(datetime.datetime.today())[:10] + '_r6_r_7'
 filename = os.path.join(subjects_dir, 'subjects_%s.txt'%td_str)
 file = open(filename, 'w')
 for subject in subjects_list:
