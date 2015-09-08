@@ -1,7 +1,7 @@
 __author__ = 'franzliem'
 
 
-def standardize_divide_by_mean(wf_name = 'standardize_divide_by_mean'):
+def standardize_divide_by_mean(wf_name='standardize_divide_by_mean'):
     # adapten from CPAC.utils.utils.get_zscore
     # function takes
     # 1. input image and mask image
@@ -12,17 +12,14 @@ def standardize_divide_by_mean(wf_name = 'standardize_divide_by_mean'):
     import nipype.interfaces.utility as util
     import nipype.interfaces.fsl as fsl
 
-    wf = Workflow(name = wf_name)
+    wf = Workflow(name=wf_name)
     inputnode = Node(util.IdentityInterface(fields=['in_file', 'mask_file']), name='inputnode')
     outputnode = Node(util.IdentityInterface(fields=['out_file']), name='outputnode')
-
 
     mean = MapNode(interface=fsl.ImageStats(), name='mean', iterfield=['in_file'])
     mean.inputs.op_string = '-k %s -m'
     wf.connect(inputnode, 'in_file', mean, 'in_file')
     wf.connect(inputnode, 'mask_file', mean, 'mask_file')
-
-
 
     def get_operand_string(mean):
         str1 = '-div %f' % (float(mean))
@@ -36,15 +33,13 @@ def standardize_divide_by_mean(wf_name = 'standardize_divide_by_mean'):
 
     wf.connect(mean, 'out_stat', op_string, 'mean')
 
-
-
     standardized = MapNode(interface=fsl.MultiImageMaths(),
                            name='standardized',
                            iterfield=['in_file', 'op_string'])
 
     wf.connect(op_string, 'op_string', standardized, 'op_string')
     wf.connect(inputnode, 'in_file', standardized, 'in_file')
-    wf.connect(inputnode, 'mask_file',standardized, 'operand_files')
+    wf.connect(inputnode, 'mask_file', standardized, 'operand_files')
     wf.connect(standardized, 'out_file', outputnode, 'out_file')
 
     return wf
@@ -63,26 +58,26 @@ def calc_variability(in_file):
     import os
 
     def save_to_nii(out_file_name, out_data, template_img):
-        out_img = nb.Nifti1Image(out_data,template_img.get_affine())
+        out_img = nb.Nifti1Image(out_data, template_img.get_affine())
         out_img.to_filename(out_file_name)
 
     img = nb.load(in_file)
     ts = img.get_data()
 
     out_file_mean = os.path.join(os.getcwd(), 'ts_mean.nii.gz')
-    ts_mean = np.mean(ts,3)
+    ts_mean = np.mean(ts, 3)
     save_to_nii(out_file_mean, ts_mean, img)
 
     out_file_std = os.path.join(os.getcwd(), 'ts_std.nii.gz')
-    ts_std = np.std(ts,3)
+    ts_std = np.std(ts, 3)
     save_to_nii(out_file_std, ts_std, img)
 
     out_file_var = os.path.join(os.getcwd(), 'ts_var.nii.gz')
-    ts_var = np.var(ts,3)
+    ts_var = np.var(ts, 3)
     save_to_nii(out_file_var, ts_var, img)
 
     out_file_mssd = os.path.join(os.getcwd(), 'ts_mssd.nii.gz')
-    ts_mssd = np.sum(np.diff(ts,3)**2, 3) / (ts.shape[3]-1)
+    ts_mssd = np.sum(np.diff(ts, 3) ** 2, 3) / (ts.shape[3] - 1)
     save_to_nii(out_file_mssd, ts_mssd, img)
 
     out_file_sqrt_mssd = os.path.join(os.getcwd(), 'ts_sqrt_mssd.nii.gz')
@@ -179,3 +174,4 @@ def residualize_imgs(in_file, mask_file, confounds_file):
     out_img = masker.inverse_transform(brain_data_2d)
     out_img.to_filename(out_file)
     return out_file
+
