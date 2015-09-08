@@ -42,8 +42,13 @@ cfg['ds_dir'] = ds_dir
 
 cfg['TR_list'] = TR_list
 
-cfg['use_n_procs'] = 26
+cfg['use_n_procs'] = 34
 cfg['plugin_name'] = 'MultiProc'
 
-calc_metrics.calc_centrality_metrics(cfg)
+# fixme
+# ignore warning from np.rank
+import warnings
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    calc_metrics.calc_centrality_metrics(cfg)
 
