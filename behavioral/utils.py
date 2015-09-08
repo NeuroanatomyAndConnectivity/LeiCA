@@ -1,8 +1,6 @@
 import os
 import pandas as pd
 
-__author__ = 'franzliem'
-
 
 def read_nki_cvs(filename):
     '''
@@ -18,12 +16,15 @@ def read_nki_cvs(filename):
     return df
 
 
+
 def merge_dataframes(df1, df2):
     '''
     returns merged data frame
     with outer: also returns subjects that are only included in one df (with nans)
     '''
+
     return pd.merge(df1, df2, left_index=True, right_index=True, how='outer')
+
 
 
 def leica_id_to_a_number_mapping(leica_subjects_file, nki_id_mapping_file):
@@ -32,13 +33,13 @@ def leica_id_to_a_number_mapping(leica_subjects_file, nki_id_mapping_file):
     for > r5 subjects
     returns dataframe with index is leica_subject_id and a_number
     '''
-    leica_subjects = pd.read_csv(leica_subjects_file, header=None, names=['leica_id'])
+
+    leica_subjects = pd.read_csv(leica_subjects_file, dtype=object, header=None, names=['leica_id'])
     leica_subjects.set_index(leica_subjects.leica_id, inplace=True)
 
     nki_id_mapping = pd.read_csv(nki_id_mapping_file)
     nki_id_mapping.set_index(nki_id_mapping.a_number, inplace=True)
     nki_id_mapping['zero_number'] = ['01'+ v[4:] for v in  nki_id_mapping.m_number.values]
-
 
     for l in leica_subjects.index:
         if l.startswith('A'): #use A number a
@@ -47,4 +48,6 @@ def leica_id_to_a_number_mapping(leica_subjects_file, nki_id_mapping_file):
             leica_subjects.loc[l,'a_number'] = \
                 nki_id_mapping.loc[nki_id_mapping.zero_number=='0161348', 'a_number'].index[0]
 
+    leica_subjects.set_index(leica_subjects.a_number, inplace=True)
+    leica_subjects.drop('a_number', axis=1, inplace=True)
     return leica_subjects
