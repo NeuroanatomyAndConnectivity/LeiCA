@@ -22,21 +22,22 @@ from variables import use_n_procs, plugin_name
 
 ## #### ## indent here
 
-test_dir = '/Users/franzliem/Desktop/mattest/'
+test_dir = '/scr/adenauer2/Franz/LeiCA_NKI_test/' # '/Users/franzliem/Desktop/mattest/'
 subject_working_dir = test_dir + 'wd'
 subject_ds_dir = test_dir + 'ds'
-time_series_file = '/Users/franzliem/Desktop/LeiCA/0144314/residual_filt_norm_warp.nii.gz'
+#time_series_file = '/Users/franzliem/Desktop/LeiCA/0144314/residual_filt_norm_warp.nii.gz'
+time_series_file = '/scr/adenauer2/Franz/LeiCA_NKI/results/0129973/rsfMRI_preprocessing/epis_MNI_3mm/03_denoised_BP_tNorm/TR_645/residual_filt_norm_warp.nii.gz'
 
 # INPUT PARAMETERS for pipeline
 
-bp_freq_list = [(0, 0), (0.01, 0.1)]
+bp_freq_list = [(None,None), (0.01, 0.1)]
 
 
 parcellations_dict = {}
 parcellations_dict['msdl'] = {'nii_path': os.path.join(template_dir, 'parcellations/msdl_atlas/MSDL_rois/msdl_rois.nii'),
                           'is_probabilistic': True}
 
-extraction_methods_list = ['correlation']
+extraction_methods_list = ['correlation', 'sparse_inverse_covariance']
 
 calc_con_mats.connectivity_matrix_wf(time_series_file,
                                      working_dir=subject_working_dir,
