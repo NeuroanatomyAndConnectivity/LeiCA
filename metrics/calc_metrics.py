@@ -387,7 +387,7 @@ def calc_centrality_metrics(cfg):
 
     ds = Node(nio.DataSink(), name='ds')
     ds.inputs.substitutions = [('_TR_id_', 'TR_')]
-    ds.inputs.regexp_substitutions = [('_subject_id_[0-9]*', ''), (
+    ds.inputs.regexp_substitutions = [('_subject_id_[A0-9]*/', ''), (
     '_z_score[0-9]*/', '')]  # , #('dc/_TR_id_[0-9]*/', ''), ('evc/_TR_id_[0-9]*/','')]
 
     #####################################
