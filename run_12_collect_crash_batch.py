@@ -7,15 +7,15 @@ Copies batch and crash folder from working_dir to results_dir
 import os, shutil
 
 from variables import working_dir, ds_dir
-from variables import subjects_list
+from variables import full_subjects_list
 
 
 
 
 
-for subject_id in subjects_list:
+for subject_id in full_subjects_list:
     print(subject_id)
-    subject_working_dir = os.path.join(working_dir, subject_id)
+    subject_working_dir = os.path.join(working_dir, 'preprocessing', subject_id)
     subject_ds_dir = os.path.join(ds_dir, subject_id)
 
     crash_dir = os.path.join(subject_working_dir, 'crash')

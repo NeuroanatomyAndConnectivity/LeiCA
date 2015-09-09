@@ -15,11 +15,12 @@ from variables import TR_list, full_subjects_list, subjects_file_prefix
 from variables import plugin_name, use_n_procs
 
 
-
+#fixme
+full_subjects_list.remove('A00056097')
 
 #fixme
 plugin_name = 'MultiProc'
-use_n_procs = 30
+use_n_procs = 15
 
 
 subjects_list = full_subjects_list
@@ -104,6 +105,7 @@ for TR in TR_list:
     df_to_edit.to_excel('group.QC.to_edit.xlsx') #.csv', sep='\t')
 
 
+
 for TR in TR_list:
     print ('***********')
     print('TR: %s'%TR)
@@ -149,7 +151,13 @@ for TR in TR_list:
 
         wf.add_nodes([report])
 
-if plugin_name == 'CondorDAGMan':
-    wf.run(plugin=plugin_name)
-if plugin_name == 'MultiProc':
-    wf.run(plugin=plugin_name, plugin_args={'n_procs': use_n_procs})
+# fixme
+# ignore warning from np.rank
+import warnings
+
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    if plugin_name == 'CondorDAGMan':
+        wf.run(plugin=plugin_name)
+    if plugin_name == 'MultiProc':
+        wf.run(plugin=plugin_name, plugin_args={'n_procs': use_n_procs})
