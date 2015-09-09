@@ -26,6 +26,7 @@ from variables import plugin_name
 working_dir = os.path.join(working_dir, 'centrality')
 ds_dir = os.path.join(ds_dir)
 
+
 # INPUT PARAMETERS for pipeline
 cfg = {}
 
@@ -44,6 +45,7 @@ cfg['TR_list'] = TR_list
 
 cfg['use_n_procs'] = 34
 cfg['plugin_name'] = 'MultiProc'
+
 
 # fixme
 # ignore warning from np.rank
