@@ -2,7 +2,7 @@ def extract_parcellation_time_series(in_data, parcellation_name, parcellations_d
     '''
     Depending on parcellation['is_probabilistic'] this function chooses either NiftiLabelsMasker or NiftiMapsMasker
     to extract the time series of each parcel
-    if bp_freq: data is band passfiltered at (hp, lp), if (0,0): no filter
+    if bp_freq: data is band passfiltered at (hp, lp), if (None,None): no filter, if (None, .1) only lp...
     tr in ms (e.g. from freesurfer ImageInfo())
     returns np.array with parcellation time series and saves this array also to parcellation_time_series_file, and
     path to pickled masker object
@@ -11,28 +11,31 @@ def extract_parcellation_time_series(in_data, parcellation_name, parcellations_d
     import os, pickle
     import numpy as np
 
+    print(parcellations_dict)
     if parcellations_dict[parcellation_name]['is_probabilistic']:  # use probab. nilearn
         masker = NiftiMapsMasker(maps_img=parcellations_dict[parcellation_name]['nii_path'])
     else:  # 0/1 labels
         masker = NiftiLabelsMasker(labels_img=parcellations_dict[parcellation_name]['nii_path'])
 
-
-    # add bandpass filter
-    if not bp_freqs == (0, 0):
-        hp, lp = bp_freqs
-        masker.low_pass = lp
-        masker.high_pass = hp
+    # add bandpass filter (only executes if freq not None
+    hp, lp = bp_freqs
+    masker.low_pass = lp
+    masker.high_pass = hp
+    if tr is not None:
         masker.t_r = float(tr) / 1000.
+    else:
+        masker.t_r = None
 
     masker.standardize = True
-    parcellation_time_series = masker.fit_transform(in_data)
-
-    parcellation_time_series_file = os.path.join(os.getcwd(), 'parcellation_time_series.npy')
-    np.save(parcellation_time_series_file, parcellation_time_series)
 
     masker_file = os.path.join(os.getcwd(), 'masker.pkl')
     with open(masker_file, 'w') as f:
         pickle.dump(masker, f)
+
+    parcellation_time_series = masker.fit_transform(in_data)
+
+    parcellation_time_series_file = os.path.join(os.getcwd(), 'parcellation_time_series.npy')
+    np.save(parcellation_time_series_file, parcellation_time_series)
 
     return parcellation_time_series, parcellation_time_series_file, masker_file
 
@@ -49,10 +52,21 @@ def calculate_connectivity_matrix(in_data, extraction_method):
     import numpy as np
 
     if extraction_method == 'correlation':
-        matrix = np.corrcoef(in_data.T)
+        correlation_matrix = np.corrcoef(in_data.T)
+        matrix = {'correlation': correlation_matrix}
+
+    if extraction_method == 'sparse_inverse_covariance':
+        # Compute the sparse inverse covariance
+        from sklearn.covariance import GraphLassoCV
+        estimator = GraphLassoCV()
+        estimator.fit(in_data)
+        matrix = {'covariance': estimator.covariance_,
+                  'sparse_inverse_covariance': estimator.precision_}
+
     else:
         raise (Exception('Unknown extraction method: %s' % extraction_method))
 
+    # load with matrix = np.load('matrix.npy')[np.newaxis][0]
     matrix_file = os.path.join(os.getcwd(), 'matrix.npy')
     np.save(matrix_file, matrix)
     return matrix, matrix_file
@@ -98,7 +112,10 @@ def connectivity_matrix_wf(time_series_file,
 
     ds = Node(nio.DataSink(base_directory=ds_dir), name='ds')
     ds.inputs.regexp_substitutions = [
-        ('subject_id_', '')]  # [('_variabilty_MNIspace_3mm[0-9]*/', ''), ('_z_score[0-9]*/', '')]
+        ('subject_id_', ''),
+        ('_parcellation_', ''),
+        ('_bp_freqs_', 'bp_'),
+        ('_extraction_method_', '')]  # [('_variabilty_MNIspace_3mm[0-9]*/', ''), ('_z_score[0-9]*/', '')]
 
 
     #####################################
@@ -154,9 +171,9 @@ def connectivity_matrix_wf(time_series_file,
     ## ds
     ##############
 
-    wf.connect(parcellated_ts, 'parcellation_time_series_file', ds, 'con_mats@parc_ts')
-    wf.connect(parcellated_ts, 'masker_file', ds, 'con_mats@masker')
-    wf.connect(con_mat, 'matrix_file', ds, 'con_mats@mat')
+    wf.connect(parcellated_ts, 'parcellation_time_series_file', ds, 'con_mats.parcellated_time_series.@parc_ts')
+    wf.connect(parcellated_ts, 'masker_file', ds, 'con_mats.parcellated_time_series.@masker')
+    wf.connect(con_mat, 'matrix_file', ds, 'con_mats.matrix.@mat')
 
 
 
